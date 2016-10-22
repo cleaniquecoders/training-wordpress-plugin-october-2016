@@ -26,11 +26,13 @@ plugin-name
 Open up `plugin-name.php` and add the following details
 
 ```php
-Plugin Name: Room Booking
+/*
+Plugin Name: Plugin Name
 Version: 1.0.0
-Description: A simple plugin to book room
+Description: A simple plugin 
 Author: Nasrul Hazim Bin Mohamad
 Author URI: http://blog.nasrulhazim.com
+ */
 
 // If this file is called directly, abort.
 if (!defined('WPINC')) {
