@@ -172,6 +172,147 @@ function plugin_prefix_run()
 plugin_prefix_run();
 ```
 
+## Talking to Database
+
+### Calling $wpdb
+
+You need to declare `$wpdb` as global in order to start making queries to database
+
+```php
+global $wpdb;
+```
+
+More details at [$wpdb](https://codex.wordpress.org/Class_Reference/wpdb#Using_the_.24wpdb_Object).
+
+### Error Handler
+
+#### Display Error
+
+```php
+ <?php $wpdb->show_errors(); ?> 
+ ```
+
+#### Hide Error
+
+ ```php
+ <?php $wpdb->hide_errors(); ?> 
+```
+
+#### Print Error
+
+```php
+<?php $wpdb->print_error(); ?> 
+```
+
+### Queries
+
+#### Select Generic Results
+
+```php
+$wpdb->get_results( 'query', output_type );
+```
+
+`output_type` can be `OBJECT`, `OBJECT_K`, `ARRAY_A`, `ARRAY_N`.
+
+#### Running General Query
+
+```php
+$wpdb->query('query');
+```
+
+#### Protect Queries Against SQL Injection Attacks
+
+```php
+$metakey    = "Harriet's Adages";
+$metavalue  = "WordPress' database interface is like Sunday Morning: Easy.";
+
+$wpdb->query( $wpdb->prepare( 
+    "
+        INSERT INTO $wpdb->postmeta
+        ( post_id, meta_key, meta_value )
+        VALUES ( %d, %s, %s )
+    ", 
+        10, 
+    $metakey, 
+    $metavalue 
+) );
+```
+
+#### Select Variable
+
+```php
+$user_count = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->users" );
+```
+
+#### Select Row
+
+```php
+$mylink = $wpdb->get_row( "SELECT * FROM $wpdb->links WHERE link_id = 10" );
+```
+
+#### Insert Data
+
+```php
+$wpdb->insert( 
+    'table', 
+    array( 
+        'column1' => 'value1', 
+        'column2' => 123 
+    ), 
+    array( 
+        '%s', 
+        '%d' 
+    ) 
+);
+```
+
+Use `$wpdb->insert_id` to get the incremental ID value after insertion.
+
+#### Update Data
+
+```php
+$wpdb->update( 
+    'table', 
+    array( 
+        'column1' => 'value1',  // string
+        'column2' => 'value2'   // integer (number) 
+    ), 
+    array( 'ID' => 1 ), 
+    array( 
+        '%s',   // value1
+        '%d'    // value2
+    ), 
+    array( '%d' ) 
+);
+```
+
+#### Delete Data
+
+```php
+$wpdb->delete( 'table', array( 'ID' => 1 ), array( '%d' ) );
+```
+
+## Setting Up Custom Table
+
+Below are the sample how to create a custom table in WordPress using `$wpdb`
+
+```php
+global $wpdb;
+$charset_collate = $wpdb->get_charset_collate();
+$table_name = $wpdb->prefix . 'my_analysis';
+
+$sql = "CREATE TABLE $table_name (
+    id mediumint(9) NOT NULL AUTO_INCREMENT,
+    time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+    views smallint(5) NOT NULL,
+    clicks smallint(5) NOT NULL,
+    UNIQUE KEY id (id)
+) $charset_collate;";
+
+require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+dbDelta( $sql );
+```
+
 ## Setting Up Plugin Dependencies
 
 ### Installing FullCalendar
